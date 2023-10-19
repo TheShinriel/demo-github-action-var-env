@@ -1,0 +1,43 @@
+name: Démonstration d'utilisation des variables d'environnement
+
+# L'action s'activera à chaque push sur le repository
+on: [push]
+
+env:
+  # A configurer dans les variables du repository, à côté des secrets
+  ACTION_VAR: ${{ vars.ENV_CONTEXT_VAR }}
+
+jobs:
+  variable-job:
+    # On tourne sur une machine ubuntu
+    runs-on: ubuntu-latest
+
+    env:
+      JOB_VAR: "Hello from job level"
+      JOB_NAME: "Best job"
+
+    strategy:
+      matrix:
+        variable: [one, two, three]
+
+    # On donne un nom à notre job
+    name: Job ${{ matrix.variable }} $JOB_NAME
+
+    steps:
+      - name: 💬 Echo de l'environnement local
+        run: echo $LOCAL_VAR
+        env:
+          LOCAL_VAR: "Hello from local level"
+
+      - name: 💬 Echo de l'environnement du job
+        run: echo $JOB_VAR
+
+      - name: 💬 Echo de l'environnement de l'action
+        run: echo $ACTION_VAR
+
+      - name: 💬 Echo de la matrix
+        run: echo ${{ matrix.variable }}
+
+      - name: 💬 Echo d'un secret
+        # Doit être défini dans les secrets du repository
+        run: echo ${{ secrets.SECRET_VAR }}
